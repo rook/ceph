@@ -206,8 +206,11 @@ if(WITH_CEPHFS_JAVA)
 endif()
 
 # Python stuff
+option(WITH_PYTHON "build python bindings" ON)
+if(WITH_PYTHON)
 find_package(PythonInterp 2 REQUIRED)
 find_package(PythonLibs 2 REQUIRED)
+endif()
 
 option(WITH_PYTHON3 "build python3 bindings" "CHECK")
 if(WITH_PYTHON3 MATCHES "check|CHECK")
@@ -556,7 +559,10 @@ if(NOT CEPH_BUILD_VIRTUALENV)
   set(CEPH_BUILD_VIRTUALENV /tmp)
 endif()
 
+if(WITH_PYTHON)
 add_subdirectory(pybind)
+endif()
+
 add_subdirectory(ceph-disk)
 add_subdirectory(ceph-detect-init)
 
