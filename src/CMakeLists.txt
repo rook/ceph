@@ -718,6 +718,12 @@ endif(WITH_TESTS)
 add_subdirectory(compressor)
 add_subdirectory(tools)
 
+# Embedded Library
+option(WITH_EMBEDDED "build the embedded ceph daemon library" OFF)
+if(WITH_EMBEDDED)
+  add_subdirectory(libcephd)
+endif()
+
 if(WITH_TESTS)
 configure_file(${CMAKE_SOURCE_DIR}/src/ceph-coverage.in
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ceph-coverage @ONLY)
