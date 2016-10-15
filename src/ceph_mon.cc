@@ -155,7 +155,7 @@ int check_mon_data_empty()
   return code;
 }
 
-void usage()
+void print_mon_usage()
 {
   cerr << "usage: ceph-mon -i monid [flags]" << std::endl;
   cerr << "  --debug_mon n\n";
@@ -179,7 +179,12 @@ void usage()
   generic_server_usage();
 }
 
-int main(int argc, const char **argv) 
+#ifdef BUILDING_FOR_EMBEDDED
+void cephd_preload_embedded_plugins();
+extern "C" int cephd_mon(int argc, const char **argv)
+#else
+int main(int argc, const char **argv)
+#endif
 {
   int err;
 
@@ -245,7 +250,7 @@ int main(int argc, const char **argv)
     if (ceph_argparse_double_dash(args, i)) {
       break;
     } else if (ceph_argparse_flag(args, i, "-h", "--help", (char*)NULL)) {
-      usage();
+      print_mon_usage();
     } else if (ceph_argparse_flag(args, i, "--mkfs", (char*)NULL)) {
       mkfs = true;
     } else if (ceph_argparse_flag(args, i, "--compact", (char*)NULL)) {
@@ -266,7 +271,7 @@ int main(int argc, const char **argv)
   }
   if (!args.empty()) {
     cerr << "too many arguments: " << args << std::endl;
-    usage();
+    print_mon_usage();
   }
 
   if (force_sync && !yes_really) {
@@ -277,12 +282,12 @@ int main(int argc, const char **argv)
 
   if (g_conf->mon_data.empty()) {
     cerr << "must specify '--mon-data=foo' data path" << std::endl;
-    usage();
+    print_mon_usage();
   }
 
   if (g_conf->name.get_id().empty()) {
     cerr << "must specify id (--id <id> or --name mon.<id>)" << std::endl;
-    usage();
+    print_mon_usage();
   }
 
   // -- mkfs --
@@ -490,8 +495,12 @@ int main(int argc, const char **argv)
     }
     common_init_finish(g_ceph_context);
     global_init_chdir(g_ceph_context);
+#ifndef BUILDING_FOR_EMBEDDED
     if (global_init_preload_erasure_code(g_ceph_context) < 0)
       prefork.exit(1);
+#else
+    cephd_preload_embedded_plugins();
+#endif
   }
 
   MonitorDBStore *store = new MonitorDBStore(g_conf->mon_data);
@@ -625,7 +634,7 @@ int main(int argc, const char **argv)
       if (err < 0) {
 	derr << argv[0] << ": error generating initial monmap: "
              << cpp_strerror(err) << dendl;
-	usage();
+	print_mon_usage();
 	prefork.exit(1);
       }
       if (tmpmap.contains(g_conf->name.get_id())) {
