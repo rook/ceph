@@ -26,6 +26,14 @@
 #define CLS_SUFFIX ".so"
 
 
+void ClassHandler::add_embedded_class(const string& cname)
+{
+  assert(mutex.is_locked());
+  ClassData *cls = _get_class(cname, false);
+  assert(cls->status == ClassData::CLASS_UNKNOWN);
+  cls->status = ClassData::CLASS_INITIALIZING;
+}
+
 int ClassHandler::open_class(const string& cname, ClassData **pcls)
 {
   Mutex::Locker lock(mutex);
@@ -75,9 +83,11 @@ int ClassHandler::open_all_classes()
 
 void ClassHandler::shutdown()
 {
-  for (auto& cls : classes) {
-    if (cls.second.handle) {
-      dlclose(cls.second.handle);
+  if (!disable_dlclose) {
+    for (auto& cls : classes) {
+      if (cls.second.handle) {
+        dlclose(cls.second.handle);
+      }
     }
   }
   classes.clear();
