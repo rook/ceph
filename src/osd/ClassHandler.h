@@ -100,7 +100,6 @@ public:
   };
 
 private:
-  Mutex mutex;
   map<string, ClassData> classes;
 
   ClassData *_get_class(const string& cname, bool check_allowed);
@@ -110,10 +109,17 @@ private:
       const std::string& list);
 
 public:
-  explicit ClassHandler(CephContext *cct_) : cct(cct_), mutex("ClassHandler") {}
-  
+  Mutex mutex;
+  bool disable_dlclose;
+
+  explicit ClassHandler(CephContext *cct_) :
+    cct(cct_),
+    mutex("ClassHandler"),
+    disable_dlclose(false) {}
+
   int open_all_classes();
 
+  void add_embedded_class(const string& cname);
   int open_class(const string& cname, ClassData **pcls);
   
   ClassData *register_class(const char *cname);
