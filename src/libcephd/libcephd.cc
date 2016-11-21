@@ -224,6 +224,7 @@ void cephd_preload_rados_classes(OSD *osd)
 extern "C" int cephd_mon(int argc, const char **argv);
 extern "C" int cephd_osd(int argc, const char **argv);
 extern "C" int cephd_mds(int argc, const char **argv);
+extern "C" int cephd_rgw(int argc, const char **argv);
 
 int cephd_run_mon(int argc, const char **argv)
 {
@@ -238,4 +239,10 @@ int cephd_run_osd(int argc, const char **argv)
 int cephd_run_mds(int argc, const char **argv)
 {
     return cephd_mds(argc, argv);
+}
+
+
+int cephd_run_rgw(int argc, const char **argv)
+{
+    return cephd_rgw(argc, argv);
 }
