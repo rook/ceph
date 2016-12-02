@@ -203,7 +203,7 @@ install(TARGETS rgw DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(WITH_EMBEDDED)
   include(MergeStaticLibraries)
-  add_library(cephd_rgw_base STATIC rgw_main.cc)
+  add_library(cephd_rgw_base STATIC rgw_main.cc ${radosgw_admin_srcs})
   set_target_properties(cephd_rgw_base PROPERTIES COMPILE_DEFINITIONS BUILDING_FOR_EMBEDDED)
   merge_static_libraries(cephd_rgw cephd_rgw_base rgw_a radosgw_a)
   target_link_libraries(cephd_rgw fcgi)
