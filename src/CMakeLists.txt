@@ -218,8 +218,8 @@ if(WITH_CEPHFS_JAVA)
 endif()
 
 # Python stuff
-find_package(PythonInterp 2 REQUIRED)
-find_package(PythonLibs 2 REQUIRED)
+find_package(PythonInterp)
+find_package(PythonLibs 2)
 
 option(WITH_PYTHON3 "build python3 bindings" "CHECK")
 if(WITH_PYTHON3 MATCHES "check|CHECK")
@@ -614,7 +614,7 @@ if(NOT CEPH_BUILD_VIRTUALENV)
   set(CEPH_BUILD_VIRTUALENV /tmp)
 endif()
 
-add_subdirectory(pybind)
+#add_subdirectory(pybind)
 add_subdirectory(ceph-disk)
 add_subdirectory(ceph-detect-init)
 
@@ -856,15 +856,17 @@ if(WITH_LIBCEPHFS)
   add_executable(ceph-syn ${ceph_syn_srcs})
   target_link_libraries(ceph-syn client global)
 
-  set(mount_ceph_srcs
-    mount/mount.ceph.c)
-  add_executable(mount.ceph ${mount_ceph_srcs}
-    $<TARGET_OBJECTS:parse_secret_objs>
-    $<TARGET_OBJECTS:common_mountcephfs_objs>)
-  target_link_libraries(mount.ceph ${KEYUTILS_LIBRARIES})
+  if(WITH_LIBCEPHFS_MOUNT)
+    set(mount_ceph_srcs
+      mount/mount.ceph.c)
+    add_executable(mount.ceph ${mount_ceph_srcs}
+      $<TARGET_OBJECTS:parse_secret_objs>
+      $<TARGET_OBJECTS:common_mountcephfs_objs>)
+    target_link_libraries(mount.ceph ${KEYUTILS_LIBRARIES})
+    install(TARGETS mount.ceph DESTINATION ${CMAKE_INSTALL_SBINDIR})
+  endif()
 
   install(TARGETS ceph-syn DESTINATION bin)
-  install(TARGETS mount.ceph DESTINATION ${CMAKE_INSTALL_SBINDIR})
 
   if(WITH_FUSE)
     set(ceph_fuse_srcs
@@ -881,9 +883,11 @@ endif(WITH_LIBCEPHFS)
 add_subdirectory(journal)
 
 if(${WITH_RBD})
-  add_library(krbd STATIC krbd.cc
-    $<TARGET_OBJECTS:parse_secret_objs>)
-  target_link_libraries(krbd ${KEYUTILS_LIBRARIES} ${UDEV_LIBRARIES})
+  if(WITH_RBD_KRBD)
+    add_library(krbd STATIC krbd.cc
+      $<TARGET_OBJECTS:parse_secret_objs>)
+    target_link_libraries(krbd ${KEYUTILS_LIBRARIES} ${UDEV_LIBRARIES})
+  endif()
   add_subdirectory(librbd)
   if(WITH_FUSE)
     add_subdirectory(rbd_fuse)
