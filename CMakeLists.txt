@@ -182,7 +182,7 @@ endif(WITH_RDMA)
 find_package(Backtrace)
 
 if(LINUX)
-  find_package(udev REQUIRED)
+  find_package(udev)
   set(HAVE_UDEV ${UDEV_FOUND})
 
   find_package(aio REQUIRED)
@@ -256,7 +256,7 @@ if(WITH_LEVELDB)
   find_file(HAVE_LEVELDB_FILTER_POLICY leveldb/filter_policy.h PATHS ${LEVELDB_INCLUDE_DIR})
 endif(WITH_LEVELDB)
 
-find_package(atomic_ops REQUIRED)
+find_package(atomic_ops)
 message(STATUS "${ATOMIC_OPS_LIBRARIES}")
 if(NOT ${ATOMIC_OPS_FOUND})
   set(NO_ATOMIC_OPS 1)
@@ -297,7 +297,7 @@ if(NOT JEMALLOC_FOUND)
 endif()
 
 if(WITH_LIBCEPHFS OR WITH_KRBD)
-  find_package(keyutils REQUIRED)
+  find_package(keyutils)
 endif()
 
 find_package(CURL REQUIRED)
@@ -569,7 +569,7 @@ endif()
 set(Boost_USE_MULTITHREADED ON)
 
 set(BOOST_COMPONENTS
-	thread system regex random program_options date_time iostreams)
+	thread system random iostreams)
 if(WITH_MGR)
 	list(APPEND BOOST_COMPONENTS python)
 endif()
