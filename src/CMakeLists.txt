@@ -85,7 +85,7 @@ set(CMAKE_ASM_COMPILER  ${PROJECT_SOURCE_DIR}/src/yasm-wrapper)
 set(CMAKE_ASM_FLAGS "-f elf64")
 
 execute_process(
-  COMMAND yasm -f elf64 ${CMAKE_SOURCE_DIR}/src/common/crc32c_intel_fast_asm.S -o /dev/null
+  COMMAND yasm -f elf64 ${CMAKE_SOURCE_DIR}/src/common/crc32c_intel_fast_asm.asm -o /dev/null
   RESULT_VARIABLE no_yasm
   OUTPUT_QUIET)
 if(no_yasm)
@@ -372,8 +372,8 @@ endif(HAVE_DPDK)
 
 if(HAVE_GOOD_YASM_ELF64)
   set(yasm_srcs
-    common/crc32c_intel_fast_asm.S
-    common/crc32c_intel_fast_zero_asm.S)
+    common/crc32c_intel_fast_asm.asm
+    common/crc32c_intel_fast_zero_asm.asm)
 endif(HAVE_GOOD_YASM_ELF64)
 
 add_library(common_buffer_obj OBJECT
