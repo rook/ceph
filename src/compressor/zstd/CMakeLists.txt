@@ -1,29 +1,32 @@
 # zstd
 
-# libzstd - build it statically
-set(ZSTD_C_FLAGS -fPIC -Wno-unused-variable -O3)
+if (NOT WITH_SYSTEM_ZSTD)
+  # libzstd - build it statically
+  set(ZSTD_C_FLAGS -fPIC -Wno-unused-variable -O3)
 
-include(ExternalProject)
-ExternalProject_Add(zstd_ext
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/zstd/build/cmake
-  CMAKE_ARGS -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-             -DCMAKE_C_FLAGS=${ZSTD_C_FLAGS}
-  BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/libzstd
-  BUILD_COMMAND $(MAKE) libzstd_static
-  INSTALL_COMMAND "true")
+  include(ExternalProject)
+  ExternalProject_Add(zstd_ext
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/zstd/build/cmake
+    CMAKE_ARGS -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+              -DCMAKE_C_FLAGS=${ZSTD_C_FLAGS}
+    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/libzstd
+    BUILD_COMMAND $(MAKE) libzstd_static
+    INSTALL_COMMAND "true")
 
-# force zstd make to be called on each time
-ExternalProject_Add_Step(zstd_ext forcebuild
-  DEPENDEES configure
-  DEPENDERS build
-  COMMAND "true"
-  ALWAYS 1)
+  # force zstd make to be called on each time
+  ExternalProject_Add_Step(zstd_ext forcebuild
+    DEPENDEES configure
+    DEPENDERS build
+    COMMAND "true"
+    ALWAYS 1)
 
-add_library(zstd STATIC IMPORTED)
-set_property(TARGET zstd PROPERTY
-  IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/libzstd/lib/libzstd.a")
-add_dependencies(zstd zstd_ext)
-set(ZSTD_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/zstd/lib)
+  add_library(zstd STATIC IMPORTED)
+  set_property(TARGET zstd PROPERTY
+    IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/libzstd/lib/libzstd.a")
+  add_dependencies(zstd zstd_ext)
+  set(ZSTD_LIBRARIES zstd)
+  set(ZSTD_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/zstd/lib)
+endif()
 
 #
 set(zstd_sources
@@ -32,7 +35,7 @@ set(zstd_sources
 
 add_library(ceph_zstd SHARED ${zstd_sources})
 add_dependencies(ceph_zstd ${CMAKE_SOURCE_DIR}/src/ceph_ver.h)
-target_link_libraries(ceph_zstd zstd)
+target_link_libraries(ceph_zstd ${ZSTD_LIBRARIES})
 set_target_properties(ceph_zstd PROPERTIES VERSION 2.0.0 SOVERSION 2)
 install(TARGETS ceph_zstd DESTINATION ${compressor_plugin_dir})
 

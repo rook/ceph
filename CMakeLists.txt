@@ -510,6 +510,12 @@ if (WITH_SYSTEM_ROCKSDB)
   find_package(rocksdb REQUIRED)
 endif()
 
+# zstd
+option(WITH_SYSTEM_ZSTD "require and build with system zstd" OFF)
+if (WITH_SYSTEM_ZSTD)
+  find_package(zstd REQUIRED)
+endif()
+
 # Boost
 option(WITH_SYSTEM_BOOST "require and build with system Boost" OFF)
 
