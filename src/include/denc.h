@@ -530,10 +530,17 @@ struct denc_traits<std::string> {
   static void decode(std::string& s, buffer::ptr::iterator& p, uint64_t f=0) {
     uint32_t len;
     ::denc(len, p);
+    decode_nohead(len, s, p);
+  }
+  static void decode_nohead(size_t len, std::string& s,
+			    buffer::ptr::iterator& p, uint64_t f=0) {
     s.clear();
     if (len) {
       s.append(p.get_pos_add(len), len);
     }
+  }
+  static void encode_nohead(const std::string& s, buffer::list::contiguous_appender& p) {
+    p.append(s.data(), s.length());
   }
 };
 

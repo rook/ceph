@@ -240,7 +240,7 @@ public:
     } else {
       static constexpr char HEADER_END[] = "\r\n";
       char sizebuf[32];
-      const auto slen = snprintf(sizebuf, sizeof(buf), "%" PRIx64 "\r\n", len);
+      const auto slen = snprintf(sizebuf, sizeof(buf), "%" PRIx64 "\r\n", uint64_t(len));
       size_t sent = 0;
 
       sent += DecoratedRestfulClient<T>::send_body(sizebuf, slen);

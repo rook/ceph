@@ -266,7 +266,7 @@ int BtrfsFileStoreBackend::create_current()
       dout(0) << "create_current: cannot statsf basedir " << cpp_strerror(ret) << dendl;
       return ret;
     }
-    if (currentfs.f_type == BTRFS_SUPER_MAGIC && basest.st_dev != st.st_dev) {
+    if ((long)currentfs.f_type == (long)BTRFS_SUPER_MAGIC && basest.st_dev != st.st_dev) {
       dout(2) << "create_current: current appears to be a btrfs subvolume" << dendl;
       stable_commits = true;
     }
@@ -345,7 +345,7 @@ int BtrfsFileStoreBackend::list_checkpoints(list<string>& ls)
       break;
     }
 
-    if (fs.f_type == BTRFS_SUPER_MAGIC && basest.st_dev != st.st_dev)
+    if ((long)fs.f_type == (long)BTRFS_SUPER_MAGIC && basest.st_dev != st.st_dev)
       snaps.push_back(string(de->d_name));
   }
 

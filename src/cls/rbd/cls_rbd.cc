@@ -1579,7 +1579,7 @@ int snapshot_add(cls_method_context_t hctx, bufferlist *in, bufferlist *out)
 
     total_read += vals.size();
     if (total_read >= snap_limit) {
-      CLS_ERR("Attempt to create snapshot over limit of %lu", snap_limit);
+      CLS_ERR("Attempt to create snapshot over limit of %llu", snap_limit);
       return -EDQUOT;
     }
 
@@ -2723,7 +2723,7 @@ int snapshot_get_limit(cls_method_context_t hctx, bufferlist *in,
     ::encode(snap_limit, *out);
   }
 
-  CLS_LOG(20, "read snapshot limit %lu", snap_limit);
+  CLS_LOG(20, "read snapshot limit %llu", snap_limit);
   return rc;
 }
 
@@ -2745,7 +2745,7 @@ int snapshot_set_limit(cls_method_context_t hctx, bufferlist *in,
     CLS_LOG(20, "remove snapshot limit\n");
     rc = cls_cxx_map_remove_key(hctx, "snap_limit");
   } else {
-    CLS_LOG(20, "set snapshot limit to %lu\n", new_limit);
+    CLS_LOG(20, "set snapshot limit to %llu\n", new_limit);
     ::encode(new_limit, bl);
     rc = cls_cxx_map_set_val(hctx, "snap_limit", &bl);
   }
