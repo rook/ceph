@@ -46,9 +46,11 @@ endif()
 
 set(gf-complete_srcs
   gf-complete/src/gf_cpu.c
+  gf-complete/src/gf.c)
+
+set(gf-complete_simd_srcs
   gf-complete/src/gf_wgen.c
   gf-complete/src/gf_w16.c
-  gf-complete/src/gf.c
   gf-complete/src/gf_w32.c
   gf-complete/src/gf_w64.c
   gf-complete/src/gf_w128.c
@@ -58,7 +60,7 @@ set(gf-complete_srcs
   gf-complete/src/gf_w8.c)
 
 if(HAVE_ARM_NEON OR HAVE_ARMV8_SIMD)
-  list(APPEND gf-complete_srcs
+  list(APPEND gf-complete_simd_srcs
     gf-complete/src/neon/gf_w4_neon.c
     gf-complete/src/neon/gf_w8_neon.c
     gf-complete/src/neon/gf_w16_neon.c
@@ -67,9 +69,11 @@ if(HAVE_ARM_NEON OR HAVE_ARMV8_SIMD)
 endif()
 
 add_library(gf-complete_objs OBJECT ${gf-complete_srcs})
-set_target_properties(gf-complete_objs PROPERTIES 
+
+add_library(gf-complete_simd_objs OBJECT ${gf-complete_simd_srcs})
+set_target_properties(gf-complete_simd_objs PROPERTIES
   COMPILE_FLAGS "${SIMD_COMPILE_FLAGS}")
-set_target_properties(gf-complete_objs PROPERTIES 
+set_target_properties(gf-complete_simd_objs PROPERTIES
   COMPILE_DEFINITIONS "${GF_COMPILE_FLAGS}")
 
 set(jerasure_srcs
@@ -83,6 +87,7 @@ add_library(jerasure_objs OBJECT ${jerasure_srcs})
 
 set(ec_jerasure_objs
   $<TARGET_OBJECTS:gf-complete_objs>
+  $<TARGET_OBJECTS:gf-complete_simd_objs>
   $<TARGET_OBJECTS:jerasure_objs>
   $<TARGET_OBJECTS:jerasure_utils>
   $<TARGET_OBJECTS:erasure_code_objs>)
@@ -102,6 +107,7 @@ endforeach()
 if(WITH_EMBEDDED)
   add_library(cephd_ec_jerasure STATIC
     $<TARGET_OBJECTS:gf-complete_objs>
+    $<TARGET_OBJECTS:gf-complete_simd_objs>
     $<TARGET_OBJECTS:jerasure_objs>
     ${jerasure_utils_src})
   set_target_properties(cephd_ec_jerasure PROPERTIES COMPILE_DEFINITIONS BUILDING_FOR_EMBEDDED)
